@@ -1,2 +1,2 @@
-# GoBoy
+# GoBoyAdventure
 GameBoy emulator in Golang
