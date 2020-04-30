@@ -93,10 +93,12 @@ func (mem *memory) read8bit(addr uint16) uint8 {
 		}
 	} else if addr < 0x8000 {
 		//val = mem.ROM[addr]
-		val = mem.cartridge.data[addr]
+		val = mem.cartridge.read8bit(addr)
 	} else if (addr >= 0x8000) && (addr < 0xA000) {
 		val = mem.VRAM[addr-0x8000]
-	} else if (addr >= 0xA000) && (addr < 0xE000) {
+	} else if (addr >= 0xA000) && (addr < 0xC000) {
+		val = mem.cartridge.read8bit(addr)
+	} else if (addr >= 0xC000) && (addr < 0xE000) {
 		val = mem.RAM[addr-0xA000]
 	} else if (addr >= 0xE000) && (addr < 0xFE00) {
 		val = mem.EchoRAM[addr-0xE000]
@@ -124,10 +126,12 @@ func (mem *memory) read16bit(addr uint16) uint16 {
 
 func (mem *memory) write8bit(addr uint16, val uint8) {
 	if addr < 0x8000 {
-		mem.cartridge.data[addr] = val
+		mem.cartridge.write8bit(addr, val)
 	} else if (addr >= 0x8000) && (addr < 0xA000) {
 		mem.VRAM[addr-0x8000] = val
-	} else if (addr >= 0xA000) && (addr < 0xE000) {
+	} else if (addr >= 0xA000) && (addr < 0xC000) {
+		mem.cartridge.write8bit(addr, val)
+	} else if (addr >= 0xC000) && (addr < 0xE000) {
 		mem.RAM[addr-0xA000] = val
 	} else if (addr >= 0xE000) && (addr < 0xFE00) {
 		mem.EchoRAM[addr-0xE000] = val
