@@ -1,5 +1,7 @@
 package gb
 
+import "fmt"
+
 var OpcodeCycles = []int{
 	1, 3, 2, 2, 1, 1, 2, 1, 5, 2, 2, 2, 1, 1, 2, 1, // 0
 	0, 3, 2, 2, 1, 1, 2, 1, 3, 2, 2, 2, 1, 1, 2, 1, // 1
@@ -19,26 +21,28 @@ var OpcodeCycles = []int{
 	3, 3, 2, 1, 0, 4, 2, 4, 3, 2, 4, 1, 0, 0, 2, 4, // f
 } //0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 
-func (gb *gameboy) executeNextOpcode() {
+func (gb *Gameboy) executeNextOpcode() {
+	fmt.Printf("PC Current> %02X, AF> %02X, BC> %02X, DE> %02X, HL> %02X \n", gb.cpu.getPC(), gb.cpu.registers.af, gb.cpu.registers.bc, gb.cpu.registers.de, gb.cpu.registers.hl)
 	opCode := gb.readOPArg8bit()
+	//log.Printf("Op> %02X ", opCode)
 	gb.cpu.cycles = OpcodeCBCycles[opCode] * 4
 	gb.opCode[opCode]()
 }
 
-func (gb *gameboy) readOPArg8bit() uint8 {
+func (gb *Gameboy) readOPArg8bit() uint8 {
 	val := gb.memory.read8bit(gb.cpu.registers.pc)
 	gb.cpu.registers.pc++
 	return val
 }
 
-func (gb *gameboy) readOPArg16bit() uint16 {
+func (gb *Gameboy) readOPArg16bit() uint16 {
 	val := gb.memory.read16bit(gb.cpu.registers.pc)
 	gb.cpu.registers.pc++
 	gb.cpu.registers.pc++
 	return val
 }
 
-func (gb *gameboy) genereOPDic() [0x100]func() {
+func (gb *Gameboy) genereOPDic() [0x100]func() {
 	dicOP := [0x100]func(){
 		//--------------------------
 		//	 8-Bit Loads
@@ -430,9 +434,9 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 
 		// LDH (n), A
 		0xE0: func() { // LDH (n),A
-			addr := uint16(gb.readOPArg8bit()) + uint16(0xFF00)
+			addr := int32(gb.readOPArg8bit()) + int32(0x0FF00)
 			val := gb.cpu.registers.af.getHi()
-			gb.memory.write8bit(addr, val)
+			gb.memory.write8bit(uint16(addr), val)
 		},
 
 		// LDH A, (n)
@@ -1000,7 +1004,7 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 			gb.cpu.registers.hl.setLo(total)
 		},
 		0x34: func() { // INC (HL)
-			addr := gb.cpu.registers.bc.getHiLo()
+			addr := gb.cpu.registers.hl.getHiLo()
 			val := gb.memory.read8bit(addr)
 			total := gb.cpu.ulaInc(val)
 			gb.memory.write8bit(addr, total)
@@ -1043,7 +1047,7 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 			gb.cpu.registers.hl.setLo(total)
 		},
 		0x35: func() { // DEC (HL)
-			addr := gb.cpu.registers.bc.getHiLo()
+			addr := gb.cpu.registers.hl.getHiLo()
 			val := gb.memory.read8bit(addr)
 			total := gb.cpu.ulaDec(val)
 			gb.memory.write8bit(addr, total)
@@ -1248,16 +1252,16 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 
 		// JR n
 		0x18: func() { // JR n
-			addr := gb.cpu.getPC()
 			val := int8(gb.readOPArg8bit())
+			addr := gb.cpu.getPC()
 			addr = uint16(int32(addr) + int32(val))
 			gb.cpu.setPC(addr)
 		},
 
 		// JR cc n
 		0x20: func() { // JR NZ n
-			addr := gb.cpu.getPC()
 			val := int8(gb.readOPArg8bit())
+			addr := gb.cpu.getPC()
 			if !gb.cpu.isZF() {
 				addr = uint16(int32(addr) + int32(val))
 				gb.cpu.setPC(addr)
@@ -1265,8 +1269,8 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 			}
 		},
 		0x28: func() { // JR Z n
-			addr := gb.cpu.getPC()
 			val := int8(gb.readOPArg8bit())
+			addr := gb.cpu.getPC()
 			if gb.cpu.isZF() {
 				addr = uint16(int32(addr) + int32(val))
 				gb.cpu.setPC(addr)
@@ -1274,8 +1278,8 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 			}
 		},
 		0x30: func() { // JR NC n
-			addr := gb.cpu.getPC()
 			val := int8(gb.readOPArg8bit())
+			addr := gb.cpu.getPC()
 			if !gb.cpu.isCY() {
 				addr = uint16(int32(addr) + int32(val))
 				gb.cpu.setPC(addr)
@@ -1283,8 +1287,8 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 			}
 		},
 		0x38: func() { // JR C n
-			addr := gb.cpu.getPC()
 			val := int8(gb.readOPArg8bit())
+			addr := gb.cpu.getPC()
 			if gb.cpu.isCY() {
 				addr = uint16(int32(addr) + int32(val))
 				gb.cpu.setPC(addr)
@@ -1416,7 +1420,8 @@ func (gb *gameboy) genereOPDic() [0x100]func() {
 		// CB
 		0xCB: func() { // CB
 			opCodeCB := gb.readOPArg8bit()
-			gb.cpu.cycles = OpcodeCBCycles[opCodeCB] * 4
+			//fmt.Printf("CB Op -> %02X\n", opCodeCB)
+			gb.cpu.cycles += OpcodeCBCycles[opCodeCB] * 4
 			gb.opCodeCB[opCodeCB]()
 		},
 	}

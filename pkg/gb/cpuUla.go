@@ -1,6 +1,8 @@
 package gb
 
 import (
+	"fmt"
+
 	byteUtils "github.com/Miz0ka/GoBoyAdventure/pkg/byteUtils"
 )
 
@@ -183,7 +185,7 @@ func (cpu *CPU) ulaSCF() {
 func (cpu *CPU) ulaRLC(reg uint8) uint8 {
 	val := reg<<1 + (reg & 0x80 >> 7)
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x80 == 0x80, CY)
@@ -194,7 +196,7 @@ func (cpu *CPU) ulaRLC(reg uint8) uint8 {
 func (cpu *CPU) ulaRL(reg uint8) uint8 {
 	val := reg<<1 + byteUtils.BoolToByte(cpu.isCY())
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x80 == 0x80, CY)
@@ -205,7 +207,7 @@ func (cpu *CPU) ulaRL(reg uint8) uint8 {
 func (cpu *CPU) ulaRRC(reg uint8) uint8 {
 	val := reg>>1 + (reg & 0x01 << 7)
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x01 == 0x01, CY)
@@ -216,7 +218,7 @@ func (cpu *CPU) ulaRRC(reg uint8) uint8 {
 func (cpu *CPU) ulaRR(reg uint8) uint8 {
 	val := reg>>1 + (byteUtils.BoolToByte(cpu.isCY()) << 7)
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x01 == 0x01, CY)
@@ -227,7 +229,7 @@ func (cpu *CPU) ulaRR(reg uint8) uint8 {
 func (cpu *CPU) ulaSLA(reg uint8) uint8 {
 	val := reg << 1
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x80 == 0x80, CY)
@@ -238,7 +240,7 @@ func (cpu *CPU) ulaSLA(reg uint8) uint8 {
 func (cpu *CPU) ulaSRA(reg uint8) uint8 {
 	val := reg>>1 | (reg & 0x80)
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x01 == 0x01, CY)
@@ -249,7 +251,7 @@ func (cpu *CPU) ulaSRA(reg uint8) uint8 {
 func (cpu *CPU) ulaSRL(reg uint8) uint8 {
 	val := reg >> 1
 
-	cpu.setFlag(val == 0, N)
+	cpu.setFlag(val == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(false, H)
 	cpu.setFlag(reg&0x01 == 0x01, CY)
@@ -260,7 +262,8 @@ func (cpu *CPU) ulaSRL(reg uint8) uint8 {
 // ============= Bit Opcodes ===============
 
 func (cpu *CPU) ulaBit(b byte, reg uint8) {
-	cpu.setFlag((reg>>b)&0x1 == 0x1, N)
+	fmt.Printf("CB Bit %d \n", (reg>>b)&1)
+	cpu.setFlag((reg>>b)&1 == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(true, H)
 }

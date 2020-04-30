@@ -13,3 +13,11 @@ func Swap(octet byte) byte {
 	octet = octet << 4
 	return octet | up
 }
+
+func Val(value byte, bit byte) byte {
+	return (value >> bit) & 0x01
+}
+
+func TestBit(value byte, bit int) bool {
+	return (value>>bit)&0x1 != 0
+}

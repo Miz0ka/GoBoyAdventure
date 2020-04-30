@@ -25,12 +25,25 @@ type CPU struct {
 	cycles           int
 }
 
-func (cpu *CPU) init() {
+func CPUinit() *CPU {
+	var cpu CPU
 	cpu.registers.pc = 0x100
+	//cpu.registers.pc = 0x26BE
 	cpu.registers.sp = 0xFFFE
+	/*
+		cpu.registers.pc = 0x000
+		cpu.registers.af.setHiLo(0x01B0)
+		cpu.registers.bc.setHiLo(0x0013)
+		cpu.registers.de.setHiLo(0x00D8)
+		cpu.registers.hl.setHiLo(0x014D)
+	*/
 	cpu.registers.af.setHiLo(0x01B0)
-	cpu.registers.bc.setHiLo(0x01B0)
-	cpu.registers.hl.setHiLo(0x01B0)
+	cpu.registers.bc.setHiLo(0x0013)
+	cpu.registers.de.setHiLo(0x00D8)
+	cpu.registers.hl.setHiLo(0x014D)
+	cpu.interruptsEnable = false
+	//log.Printf("AF-> %d\n", cpu.registers.hl.getHiLo())
+	return &cpu
 }
 
 func (cpu *CPU) isHalt() bool {
@@ -91,18 +104,18 @@ func (cpu *CPU) getSP() uint16 {
 	return cpu.registers.sp
 }
 
-func (gb *gameboy) push(val uint16) {
+func (gb *Gameboy) push(val uint16) {
 	gb.cpu.registers.sp -= 2
 	gb.memory.write16bit(gb.cpu.registers.sp, val)
 }
 
-func (gb *gameboy) pop() uint16 {
+func (gb *Gameboy) pop() uint16 {
 	addr := gb.memory.read16bit(gb.cpu.registers.sp)
 	gb.cpu.registers.sp += 2
 	return addr
 }
 
-func (gb *gameboy) cpuCall(addr uint16) {
+func (gb *Gameboy) cpuCall(addr uint16) {
 	addrSp := gb.cpu.getPC()
 	gb.push(addrSp)
 	gb.cpu.setPC(addr)
