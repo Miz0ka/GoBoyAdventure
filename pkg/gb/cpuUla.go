@@ -70,13 +70,13 @@ func (cpu *CPU) ulaCP(reg1, reg2 uint8) {
 }
 
 func (cpu *CPU) ulaInc(reg uint8) uint8 {
-	total := uint16(reg) + 1
+	total := uint8(uint16(reg) + 1)
 
 	cpu.setFlag(total == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag((reg&0xF)+1 > 0xF, H)
 
-	return uint8(total)
+	return total
 }
 
 func (cpu *CPU) ulaDec(reg uint8) uint8 {
