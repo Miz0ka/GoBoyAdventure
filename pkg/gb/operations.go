@@ -22,9 +22,9 @@ var OpcodeCycles = []int{
 } //0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 
 func (gb *Gameboy) executeNextOpcode() {
-	fmt.Printf("PC Current> %02X, AF> %02X, BC> %02X, DE> %02X, HL> %02X \n", gb.cpu.getPC(), gb.cpu.registers.af, gb.cpu.registers.bc, gb.cpu.registers.de, gb.cpu.registers.hl)
+	fmt.Printf("PC Current> %02X, AF> %02X, BC> %02X, DE> %02X, HL> %02X \n", gb.cpu.getPC(), gb.cpu.registers.af.getHiLo(), gb.cpu.registers.bc.getHiLo(), gb.cpu.registers.de.getHiLo(), gb.cpu.registers.hl.getHiLo())
 	opCode := gb.readOPArg8bit()
-	//log.Printf("Op> %02X ", opCode)
+	fmt.Printf("Op> %02X ", opCode)
 	gb.cpu.cycles = OpcodeCBCycles[opCode] * 4
 	gb.opCode[opCode]()
 }
