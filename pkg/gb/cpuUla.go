@@ -84,7 +84,7 @@ func (cpu *CPU) ulaDec(reg uint8) uint8 {
 
 	cpu.setFlag(total == 0, ZF)
 	cpu.setFlag(true, N)
-	cpu.setFlag((reg&0xF)+1 < 0, H)
+	cpu.setFlag((reg&0xF) == 0, H)
 
 	return uint8(total)
 }
@@ -94,7 +94,6 @@ func (cpu *CPU) ulaDec(reg uint8) uint8 {
 func (cpu *CPU) ulaAdd16(reg1 uint16, reg2 uint16) uint16 {
 	total := uint32(reg1) + uint32(reg2)
 
-	cpu.setFlag(total == 0, ZF)
 	cpu.setFlag(false, N)
 	cpu.setFlag(uint16(reg1&0xFFF)+uint16(reg2&0xFFF) > 0xFFF, H)
 	cpu.setFlag(total > 0xFFFF, CY)
