@@ -22,9 +22,9 @@ var OpcodeCycles = []int{
 } //0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 
 func (gb *Gameboy) executeNextOpcode() {
-	fmt.Printf("PC Current> %02X, AF> %02X, BC> %02X, DE> %02X, HL> %02X \n", gb.cpu.getPC(), gb.cpu.registers.af.getHiLo(), gb.cpu.registers.bc.getHiLo(), gb.cpu.registers.de.getHiLo(), gb.cpu.registers.hl.getHiLo())
+	//fmt.Printf("PC Current> %02X, AF> %02X, BC> %02X, DE> %02X, HL> %02X ", gb.cpu.getPC(), gb.cpu.registers.af.getHiLo(), gb.cpu.registers.bc.getHiLo(), gb.cpu.registers.de.getHiLo(), gb.cpu.registers.hl.getHiLo())
 	opCode := gb.readOPArg8bit()
-	fmt.Printf("Op> %02X ", opCode)
+	fmt.Printf("Op> %02X \n", opCode)
 	gb.cpu.cycles = OpcodeCBCycles[opCode] * 4
 	gb.opCode[opCode]()
 }
@@ -77,7 +77,7 @@ func (gb *Gameboy) genereOPDic() [0x100]func() {
 		// LD r1 r2
 		0x7F: func() { // LD A, A
 			val := gb.cpu.registers.af.getHi()
-			gb.cpu.registers.bc.setHi(val)
+			gb.cpu.registers.af.setHi(val)
 		},
 		0x78: func() { // LD A, B
 			val := gb.cpu.registers.bc.getHi()
@@ -491,36 +491,44 @@ func (gb *Gameboy) genereOPDic() [0x100]func() {
 		// PUSH rr
 		0xF5: func() { // PUSH AF
 			val := gb.cpu.registers.af.getHiLo()
+			//fmt.Printf("Push AF> %04X \n", val)
 			gb.push(val)
 		},
 		0xC5: func() { // PUSH BC
 			val := gb.cpu.registers.bc.getHiLo()
+			//fmt.Printf("Push BC> %04X \n", val)
 			gb.push(val)
 		},
 		0xD5: func() { // PUSH DE
 			val := gb.cpu.registers.de.getHiLo()
+			//fmt.Printf("Push DE> %04X \n", val)
 			gb.push(val)
 		},
 		0xE5: func() { // PUSH HL
 			val := gb.cpu.registers.hl.getHiLo()
+			//fmt.Printf("Push HL> %04X \n", val)
 			gb.push(val)
 		},
 
 		// POP rr
 		0xF1: func() { // POP AF
 			val := gb.pop()
+			//fmt.Printf("Pop AF> %04X \n", val)
 			gb.cpu.registers.af.setHiLo(val)
 		},
 		0xC1: func() { // POP BC
 			val := gb.pop()
+			//fmt.Printf("Pop BC> %04X \n", val)
 			gb.cpu.registers.bc.setHiLo(val)
 		},
 		0xD1: func() { // POP DE
 			val := gb.pop()
+			//fmt.Printf("Pop DE> %04X \n", val)
 			gb.cpu.registers.de.setHiLo(val)
 		},
 		0xE1: func() { // POP HL
 			val := gb.pop()
+			//fmt.Printf("Pop HL> %04X \n", val)
 			gb.cpu.registers.hl.setHiLo(val)
 		},
 
@@ -745,12 +753,12 @@ func (gb *Gameboy) genereOPDic() [0x100]func() {
 			total := gb.cpu.ulaSub(val1, val2, true)
 			gb.cpu.registers.af.setHi(total)
 		},
-		/*0xCE : func () { // SBC A, n
+		0xDE: func() { // SBC A, n
 			val1 := gb.cpu.registers.af.getHi()
 			val2 := gb.readOPArg8bit()
 			total := gb.cpu.ulaSub(val1, val2, true)
 			gb.cpu.registers.af.setHi(total)
-		},*/
+		},
 
 		// AND A, n
 		0xA7: func() { // AND A, A
@@ -1079,7 +1087,7 @@ func (gb *Gameboy) genereOPDic() [0x100]func() {
 			val1 := gb.cpu.registers.hl.getHiLo()
 			val2 := gb.cpu.getSP()
 			total := gb.cpu.ulaAdd16(val1, val2)
-			gb.cpu.registers.af.setHiLo(total)
+			gb.cpu.registers.hl.setHiLo(total)
 		},
 
 		//ADD SP, n

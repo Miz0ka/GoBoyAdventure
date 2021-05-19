@@ -1,6 +1,7 @@
 package gb
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -27,6 +28,7 @@ func CartrigdeInit(url string) *Cartridge {
 	}*/
 	//cart.data = make([]byte, 0x10000)
 	var cart Cartridge
+	fmt.Printf("ROM: %s\n", url)
 	cart.url = url
 	var err error
 	cart.data, err = ioutil.ReadFile(url)

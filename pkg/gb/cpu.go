@@ -38,9 +38,12 @@ func CPUinit() *CPU {
 		cpu.registers.hl.setHiLo(0x014D)
 	*/
 	cpu.registers.af.setHiLo(0x01B0)
-	cpu.registers.bc.setHiLo(0x0013)
-	cpu.registers.de.setHiLo(0x00D8)
-	cpu.registers.hl.setHiLo(0x014D)
+	//cpu.registers.bc.setHiLo(0x0013)
+	cpu.registers.bc.setHiLo(0x0000)
+	//cpu.registers.de.setHiLo(0x00D8)
+	cpu.registers.de.setHiLo(0xFF56)
+	//cpu.registers.hl.setHiLo(0x014D)
+	cpu.registers.hl.setHiLo(0x000D)
 	cpu.interruptsEnable = false
 	//log.Printf("AF-> %d\n", cpu.registers.hl.getHiLo())
 	return &cpu
@@ -62,18 +65,22 @@ func (cpu *CPU) setInterruptsEnable(status bool) {
 	cpu.interruptsEnable = status
 }
 
+// Check ZF flag
 func (cpu *CPU) isZF() bool {
 	return ((cpu.registers.af.getLo() & ZF) == ZF)
 }
 
+// Check N flag
 func (cpu *CPU) isN() bool {
 	return ((cpu.registers.af.getLo() & N) == N)
 }
 
+// Check H flag
 func (cpu *CPU) isH() bool {
 	return ((cpu.registers.af.getLo() & H) == H)
 }
 
+// Check CY flag
 func (cpu *CPU) isCY() bool {
 	return ((cpu.registers.af.getLo() & CY) == CY)
 }
@@ -104,17 +111,20 @@ func (cpu *CPU) getSP() uint16 {
 	return cpu.registers.sp
 }
 
+// Push the value on the heap
 func (gb *Gameboy) push(val uint16) {
 	gb.cpu.registers.sp -= 2
 	gb.memory.write16bit(gb.cpu.registers.sp, val)
 }
 
+// Pull the top of the heap and return it
 func (gb *Gameboy) pop() uint16 {
 	addr := gb.memory.read16bit(gb.cpu.registers.sp)
 	gb.cpu.registers.sp += 2
 	return addr
 }
 
+// Save PC in the heap and put param as PC
 func (gb *Gameboy) cpuCall(addr uint16) {
 	addrSp := gb.cpu.getPC()
 	gb.push(addrSp)

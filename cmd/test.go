@@ -21,7 +21,22 @@ func main() {
 
 func run() {
 	var gbemu gb.Gameboy
-	gbemu.Init("../roms/07-jr,jp,call,ret,rst.GB")
+	//gbemu.Init("../roms/Zoids Densetsu.GB")
+	//gbemu.Init("../roms/Monster Maker.GB")
+	//gbemu.Init("../roms/Doraemon.GB")
+	//gbemu.Init("../roms/Tetris.GB")
+	//gbemu.Init("../roms/01-special.GB")
+	//gbemu.Init("../roms/02-interrupts.GB")
+	//gbemu.Init("../roms/03-op sp,hl.GB") Ok
+	gbemu.Init("../roms/04-op r,imm.GB") // Crash
+	//gbemu.Init("../roms/05-op rp.GB") Ok
+	//gbemu.Init("../roms/06-ld r,r.GB") Ok
+	//gbemu.Init("../roms/07-jr,jp,call,ret,rst.GB") // Long
+	//gbemu.Init("../roms/08-misc instrs.GB") // F1
+	//gbemu.Init("../roms/09-op r,r.GB")
+	//gbemu.Init("../roms/10-bit ops.GB") Ok
+	//gbemu.Init("../roms/11-op a,(hl).GB")
+	//gbemu.Init("../roms/bgbtest.GB")
 
 	cfg := pixelgl.WindowConfig{
 		Title:  gbemu.GetGameTitle(),
@@ -67,18 +82,18 @@ func run() {
 		}
 		stat = gbemu.GetCPUSTAT()
 		fmt.Fprintf(statText, "PC -> %04X \n", stat[0])
-		fmt.Printf("PC -> %04X ", stat[0])
+		//fmt.Printf("PC -> %04X ", stat[0])
 		fmt.Fprintf(statText, "SP -> %04X \n", stat[1])
-		fmt.Printf("SP -> %04X ", stat[1])
+		//fmt.Printf("SP -> %04X ", stat[1])
 		fmt.Fprintf(statText, "AF -> %04X \n", stat[2])
-		fmt.Printf("AF -> %04X ", stat[2])
+		//fmt.Printf("AF -> %04X ", stat[2])
 		fmt.Fprintf(statText, "BC -> %04X \n", stat[3])
-		fmt.Printf("BC -> %04X ", stat[3])
+		//fmt.Printf("BC -> %04X ", stat[3])
 		fmt.Fprintf(statText, "DE -> %04X \n", stat[4])
-		fmt.Printf("DE -> %04X ", stat[4])
+		//fmt.Printf("DE -> %04X ", stat[4])
 		fmt.Fprintf(statText, "HL -> %04X \n", stat[5])
-		fmt.Printf("HL -> %04X ", stat[5])
-		fmt.Printf("Scanline -> %d \n", stat[6])
+		//fmt.Printf("HL -> %04X ", stat[5])
+		//fmt.Printf("Scanline -> %d \n", stat[6])
 		fmt.Fprintf(statText, "Scanline -> %d \n", stat[6])
 		fmt.Fprintf(statText, "Button -> %04b \n", stat[7])
 		fmt.Fprintf(statText, "direction -> %04b \n", stat[8])
